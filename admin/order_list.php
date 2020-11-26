@@ -4,20 +4,11 @@
   require '../config/common.php';
 
   
-  if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in']) && $_SESSION['role'] == '0'){
-  header('location: login.php');
+  if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])){
+    header('location: login.php');
   }
   if($_SESSION['role'] != 1){
     header('location: login.php');
-  }
-
-  if(!empty($_POST['search'])){
-    setcookie('search', $_POST['search'], time() + (86400 * 30), "/");
-  }else{
-    if(empty($_GET['pageno'])){
-      unset($_COOKIE['search']); 
-      setcookie('search', null, -1, '/');
-    }
   }
 
 
@@ -32,7 +23,7 @@
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">Product listings</h3>
+                <h3 class="card-title">Order listings</h3>
               </div>
               <!-- /.card-header -->
               <?php
@@ -44,44 +35,26 @@
                   $numOfrecord = 5;
                   $offset = ($pageno-1)*$numOfrecord;
 
-                if(empty($_POST['search']) && empty($_COOKIE['search'])){
-
-                  $stmt = $pdo->prepare("SELECT * FROM products ORDER BY id DESC");
+                  $stmt = $pdo->prepare("SELECT * FROM sale_orders ORDER BY id DESC");
                   $stmt->execute();
                   $rawResult = $stmt->fetchAll();
                   $total_pages = ceil(count($rawResult)/$numOfrecord);
 
-                  $stmt = $pdo->prepare("SELECT * FROM products ORDER BY id DESC LIMIT $offset,$numOfrecord");
+                  $stmt = $pdo->prepare("SELECT * FROM sale_orders ORDER BY id DESC LIMIT $offset,$numOfrecord");
                   $stmt->execute();
                   $result = $stmt->fetchAll();
-                }else{
-                  
-                  $search = !empty($_POST['search']) ? $_POST['search'] : $_COOKIE['search'];
-                  $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE '%$search%' ORDER BY id DESC");
-                  $stmt->execute();
-                  $rawResult = $stmt->fetchAll();
-                  $total_pages = ceil(count($rawResult)/$numOfrecord);
-
-                  $stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE '%$search%' ORDER BY id DESC LIMIT $offset,$numOfrecord");
-                  $stmt->execute();
-                  $result = $stmt->fetchAll();
-                }
+               
 
               ?>
               
               <div class="card-body">
-                <div>
-                  <a href="product_add.php" type="button" class="btn btn-success">New Product</a>
-                </div><br>
                 <table class="table table-bordered">
                   <thead>                  
                     <tr>
                       <th style="width: 10px">ID</th>
-                      <th>Name</th>
-                      <th>Description</th>
-                      <th>Category</th>
-                      <th>Instock</th>
-                      <th>Price</th>
+                      <th>User</th>
+                      <th>Total Price</th>
+                      <th>Order Date</th>
                       <th style="width: 40px">Action</th>
                     </tr>
                   </thead>
@@ -90,25 +63,20 @@
                     if($result){
                     $i=1;
                     foreach($result as $value){
-                      $cateStmt = $pdo->prepare("SELECT * FROM categories WHERE id=".$value['category_id']);
-                      $cateStmt->execute();
-                      $cateResult = $cateStmt->fetchAll();
+                      $userStmt = $pdo->prepare("SELECT * FROM users WHERE id=".$value['user_id']);
+                      $userStmt->execute();
+                      $userResult = $userStmt->fetchAll();
                     ?>
 
                       <tr>
                       <td><?php echo $i ?></td>
-                      <td><?php echo escape($value['name']) ?></td>
-                      <td><?php echo escape(substr($value['description'],0,30)) ?></td>
-                      <td><?php echo escape($cateResult[0]['name']) ?></td>
-                      <td><?php echo escape($value['quantity']) ?></td>
-                      <td><?php echo escape($value['price']) ?></td>
+                      <td><?php echo escape($userResult[0]['name']) ?></td>
+                      <td><?php echo escape($value['total_price']) ?></td>
+                      <td><?php echo escape(date('Y-m-d',strtotime($value['order_date']))) ?></td>
                       <td>
                         <div class="btn-group">
                           <div class="container">
-                            <a href="product_edit.php?id=<?php echo $value['id']?>" type="button" class="btn btn-warning">Edit</a>
-                          </div>
-                          <div class="container">
-                            <a href="product_delete.php?id=<?php echo $value['id']?>" type="button" class="btn btn-danger" onclick="return confirm('Are you sure to delete?');">Delete</a>
+                            <a href="order_detail.php?id=<?php echo $value['id']?>" type="button" class="btn btn-default">View</a>
                           </div>
                         </div>
                       </td>

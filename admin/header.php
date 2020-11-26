@@ -39,6 +39,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     ?>
 
+    <?php if($page != 'order_list.php') {?>
+
     <!-- SEARCH FORM -->
     <form class="form-inline ml-3" method="post"
     <?php if($page == 'index.php') : ?>
@@ -61,6 +63,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         </div>
       </div>
     </form>
+    <?php }?>
 
   </nav>
   <!-- /.navbar -->
@@ -114,7 +117,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <i class="nav-icon fa fa-fw fa-user"></i>
               <p>
                 User
-                <!-- <span class="right badge badge-danger">New</span> -->
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="order_list.php" class="nav-link">
+              <i class="nav-icon fa fa-fw fa-table"></i>
+              <p>
+                Order
               </p>
             </a>
           </li>
