@@ -11,23 +11,39 @@ if($_SESSION['role'] != 1){
     header('location: login.php');
 }
 if($_POST){
-    if(empty($_POST['name']) || empty($_POST['email']) || empty($_POST['password']) || strlen($_POST['password'])<5){
+    if(empty($_POST['name']) || empty($_POST['email']) || empty($_POST['password']) || 
+        empty($_POST['phone']) || empty($_POST['address']) || strlen($_POST['password'])<5){
+        
         if(empty($_POST['name'])){
             $nameError = 'Name cannot be null!';
         }
+
         if(empty($_POST['email'])){
             $emailError = 'Email cannot be null!';
         }
+
         if(empty($_POST['password'])){
             $passwordError = 'Password cannot be null!';
         }else if(strlen($_POST['password'])<5){
             $passwordError = 'Password must be  5 charactersat least!';
         }
+
+        if(empty($_POST['phone'])){
+            $phoneError = 'Phone cannot be null!';
+        }
+
+        if(empty($_POST['address'])){
+            $addressError = 'Address cannot be null!';
+        }
+
     }else{
 
         $name = $_POST['name'];
         $email = $_POST['email'];
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $phone = $_POST['phone'];
+        $address = $_POST['address'];
+
         if(empty($_POST['role'])){
             $role = 0;
         }else{
@@ -41,12 +57,14 @@ if($_POST){
             echo"<script>alert('Email duplicated');window.location.href='user_add.php';</script>";
         
         }else{
-        $stmt = $pdo->prepare("INSERT INTO users(name,email,password,role) VALUES(:name,:email,:password,:role)");
+        $stmt = $pdo->prepare("INSERT INTO users(name,email,password,phone,address,role) VALUES(:name,:email,:password,:phone,:address,:role)");
         $result=$stmt->execute(
             array(
                 ':name'=>$name,
                 ':email'=>$email,
                 ':password'=>$password,
+                ':phone'=>$phone,
+                ':address'=>$address,
                 ':role'=>$role
                 )
             );
@@ -90,6 +108,14 @@ if($_POST){
                     <div class="form-group">
                         <label for="">Password</label><p style="color:red"><?php echo  empty($passwordError) ? '' : '*'.$passwordError ?></p>
                         <input type="password" name="password" id="" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Phone</label><p style="color:red"><?php echo  empty($phoneError) ? '' : '*'.$phoneError ?></p>
+                        <input type="text" name="phone" id="" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Address</label><p style="color:red"><?php echo  empty($addressError) ? '' : '*'.$addressError ?></p>
+                        <input type="text" name="address" id="" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="">Admin</label><br>

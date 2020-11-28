@@ -13,12 +13,18 @@ if($_SESSION['role'] != 1){
 }
 
 if($_POST){
-    if(empty($_POST['name']) || empty($_POST['email'])){
+    if(empty($_POST['name']) || empty($_POST['email']) || empty($_POST['phone']) || empty($_POST['address'])){
         if(empty($_POST['name'])){
             $nameError = 'Name cannot be null!';
         }
         if(empty($_POST['email'])){
             $emailError = 'Email cannot be null!';
+        }
+        if(empty($_POST['phone'])){
+            $phoneError = 'Phone cannot be null!';
+        }
+        if(empty($_POST['address'])){
+            $addressError = 'Address cannot be null!';
         }
 
     }else if(!empty($_POST['password']) && strlen($_POST['password'])<5){
@@ -31,6 +37,9 @@ if($_POST){
         $name = $_POST['name'];
         $email = $_POST['email'];
         $password = $_POST['password'];
+        $phone = $_POST['phone'];
+        $address = $_POST['address'];
+
         if(empty($_POST['role'])){
             $role = 0;
         }else{
@@ -50,10 +59,11 @@ if($_POST){
         
         }else{
         if($password){
-        $stmt = $pdo->prepare("UPDATE  users SET name='$name',email='$email',password='$password',role='$role' WHERE id='$id'");
+        $stmt = $pdo->prepare("UPDATE  users SET name='$name',email='$email',password='$password',phone='$phone',
+                                address='$address',role='$role' WHERE id='$id'");
 
         }else{
-        $stmt = $pdo->prepare("UPDATE  users SET name='$name',email='$email',role='$role' WHERE id='$id'");
+        $stmt = $pdo->prepare("UPDATE  users SET name='$name',email='$email',phone='$phone',address='$address',role='$role' WHERE id='$id'");
 
         }
         $result=$stmt->execute();
@@ -100,6 +110,14 @@ if($_POST){
                         <label for="">Password</label><p style="color:red"><?php echo  empty($passwordError) ? '' : '*'.$passwordError ?></p>
                         <span style="font-size:10px">The user already has a password.</span>
                         <input type="password" name="password" id="" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Phone</label><p style="color:red"><?php echo  empty($phoneError) ? '' : '*'.$phoneError ?></p>
+                        <input type="text" name="phone" id="" class="form-control" value="<?php echo escape($output['phone'])?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Address</label><p style="color:red"><?php echo  empty($addressError) ? '' : '*'.$addressError ?></p>
+                        <input type="text" name="address" id="" class="form-control" value="<?php echo escape($output['address'])?>">
                     </div>
                     <div class="form-group">
                         <label for="">Admin</label><br>

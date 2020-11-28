@@ -39,6 +39,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     ?>
 
+    <?php if($page == 'index.php' || $page == 'category_list.php' || $page == 'user_list.php'){?>
+
     <?php if($page != 'order_list.php') {?>
 
     <!-- SEARCH FORM -->
@@ -64,6 +66,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </div>
     </form>
     <?php }?>
+    <?php } ?>
 
   </nav>
   <!-- /.navbar -->
