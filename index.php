@@ -25,7 +25,7 @@
 			}else{
 			$pageno = 1;
 			}
-			$numOfrecords = 1;
+			$numOfrecords = 3;
 			$offest = ($pageno-1)*$numOfrecords;
 
 		if(empty($_POST['search']) && empty($_COOKIE['search'])){
@@ -141,7 +141,7 @@
 									<span class="ti-bag"></span>
 									<p class="hover-text">add to bag</p>
 								</a>
-								<a href="" class="social-info">
+								<a href="product_detail.php?product_id=<?php echo escape($item['id']) ?>" class="social-info">
 									<span class="lnr lnr-move"></span>
 									<p class="hover-text">view more</p>
 								</a>
