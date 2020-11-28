@@ -14,8 +14,8 @@
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if($result){
-          
-            if((password_verify($password,$result['password'])) && $result['role']==1){
+
+            if((password_verify($password,$result['password'])) && $result['role'] == 1){
               $_SESSION['user_id'] = $result['id'];
               $_SESSION['user_name'] = $result['name'];
               $_SESSION['role'] = 1;

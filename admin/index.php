@@ -4,7 +4,7 @@
   require '../config/common.php';
 
   
-  if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in']) && $_SESSION['role'] == '0'){
+  if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])){
   header('location: login.php');
   }
   if($_SESSION['role'] != 1){

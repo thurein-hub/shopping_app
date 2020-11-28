@@ -1,31 +1,36 @@
-<?php
-	session_start();
-	require 'config/config.php';
-	require 'config/common.php';
+<?php  
+    session_start();
+    require 'config/config.php';
+    require 'config/common.php';
 
-	if($_POST){
-		$email = $_POST['email'];
-		$password = $_POST['password'];
+  
+    if($_POST){
+        $email = $_POST['email'];
+        $password = $_POST['password'];
 
-		$stmt = $pdo->prepare("SELECT * FROM users WHERE email=:email");
-		$stmt->execute([':email'=>$email]);
-		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt->bindValue(':email',$email);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        if($result){
+			
+            if(password_verify($password,$result['password'])){
+              $_SESSION['user_id'] = $result['id'];
+              $_SESSION['user_name'] = $result['name'];
+              $_SESSION['role'] = 0;
+			  $_SESSION['logged_in'] = time();
+			  
+			  header('location: index.php');
 		
-		if($result){
-			if(password_verify($password, $result['password'])){
-				$_SESSION['user_id'] = $result['id'];
-				$_SESSION['user_name'] = $result['name'];
-				$_SESSION['logged_in'] = time();
-				$_SESSION['role'] = 0;
-				header('Location: index.php');
-			}
-		}else{
-			echo"<script>alert('Incorrect Credentials');window.location.href='login.php';</script>";
-		}
-	}
-	
+  
+            }
+        }else{
+          echo"<script>alert('Incorrect email and password');window.location.href='login.php';</script>";
+        }
+       
 
+    }
 
 ?>
 
@@ -69,7 +74,7 @@
 			<nav class="navbar navbar-expand-lg navbar-light main_box">
 				<div class="container">
 					<!-- Brand and toggle get grouped for better mobile display -->
-					<a class="navbar-brand logo_h" href="index.html">Sunshine Shopping</a>
+					<a class="navbar-brand logo_h" href="index.php">Sunshine Shopping</a>
 					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
 					 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 						<span class="icon-bar"></span>
@@ -83,6 +88,7 @@
 		<div class="search_input" id="search_input_box">
 			<div class="container">
 				<form class="d-flex justify-content-between">
+					<input name="_token" type="hidden" value="<?php echo $_SESSION['_token']; ?>">
 					<input type="text" class="form-control" id="search_input" placeholder="Search Here">
 					<button type="submit" class="btn"></button>
 					<span class="lnr lnr-cross" id="close_search" title="Close Search"></span>
@@ -152,7 +158,9 @@
 				
 			<div class="footer-bottom d-flex justify-content-center align-items-center flex-wrap">
 				<p class="footer-text m-0"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+				Copyright &copy;<script>document.write(new Date().getFullYear());</script> 
+				All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> 
+				by <a href="https://colorlib.com" target="_blank">Colorlib</a>
 <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
 </p>
 			</div>
