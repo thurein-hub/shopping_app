@@ -1,11 +1,4 @@
 <?php 
-	session_start();
-	require 'config/common.php';
-	require 'config/config.php';
-
-	if (empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
-		header('Location: login.php');
-	}
 
 	if (!empty($_POST['search'])) {
 	setcookie('search',$_POST['search'], time() + (86400 * 30), "/");
@@ -19,34 +12,35 @@
 ?>
 <?php include('header.php') ?>
 	<?php
-
+		require 'config/config.php';
 		if(!empty($_GET['pageno'])){
 			$pageno = $_GET['pageno'];
 			}else{
 			$pageno = 1;
 			}
-			$numOfrecords = 3;
+			$numOfrecords = 5;
 			$offest = ($pageno-1)*$numOfrecords;
 
 		if(empty($_POST['search']) && empty($_COOKIE['search'])){
 
 			if(!empty($_GET['category_id'])){
-				$stmt = $pdo->prepare("SELECT * FROM products WHERE category_id=".$_GET['category_id']." ORDER BY id DESC");
+				
+				$cateId = $_GET['category_id'];
+				$stmt = $pdo->prepare("SELECT * FROM products WHERE category_id=$cateId AND quantity>0 ORDER BY id DESC");
 				$stmt->execute();
 				$rawResult = $stmt->fetchAll();
 				$total_pages = ceil(count($rawResult)/$numOfrecords);
 	
-				$stmt = $pdo->prepare("SELECT * FROM products WHERE category_id=".$_GET['category_id']." ORDER BY id DESC 
-										LIMIT $offest,$numOfrecords");
+				$stmt = $pdo->prepare("SELECT * FROM products WHERE category_id=$cateId AND quantity>0 ORDER BY id DESC LIMIT $offest,$numOfrecords");
 				$stmt->execute();
 				$result = $stmt->fetchAll();	
 			}else{
-				$stmt = $pdo->prepare("SELECT * FROM products ORDER BY id DESC");
+				$stmt = $pdo->prepare("SELECT * FROM products WHERE quantity>0 ORDER BY id DESC");
 				$stmt->execute();
 				$rawResult = $stmt->fetchAll();
 				$total_pages = ceil(count($rawResult)/$numOfrecords);
 	
-				$stmt = $pdo->prepare("SELECT * FROM products ORDER BY id DESC LIMIT $offest,$numOfrecords");
+				$stmt = $pdo->prepare("SELECT * FROM products WHERE  quantity>0 ORDER BY id DESC LIMIT $offest,$numOfrecords");
 				$stmt->execute();
 				$result = $stmt->fetchAll();
 			}
@@ -55,13 +49,13 @@
 
 		}else{
 			$search = !empty($_POST['search']) ? $_POST['search'] : $_COOKIE['search'];
-			$stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE '%$search%' ORDER BY id DESC");
+			$stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE '%$search%' AND quantity>0 ORDER BY id DESC");
 			$stmt->execute();
 			$rawResult = $stmt->fetchAll();
 
 			$total_pages = ceil(count($rawResult)/$numOfrecords);
 
-			$stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE '%$search%' ORDER BY id DESC LIMIT $offest,$numOfrecords");
+			$stmt = $pdo->prepare("SELECT * FROM products WHERE name LIKE '%$search%' AND quantity>0 ORDER BY id DESC LIMIT $offest,$numOfrecords");
 			$stmt->execute();
 			$result = $stmt->fetchAll();
 
@@ -97,25 +91,25 @@
 	<div class="filter-bar d-flex flex-wrap align-items-center">
 		<div class="pagination">
 			<?php if(!empty($_GET['category_id'])) :?>
-				<a href="?pageno=1&category_id=<?php echo $_GET['category_id']?>" >First</a>
+				<a href="?pageno=1&category_id=<?php echo $_GET['category_id']?>" class="active">First</a>
 				<a <?php if($pageno <= 1){echo'disabled';}?>
 				href="<?php if($pageno <= 1){echo "#";}else{ echo "?pageno=".($pageno-1)."&category_id=".$_GET['category_id'];}?>" class="prev-arrow">
 				<i class="fa fa-long-arrow-left" aria-hidden="true"></i></a>
-				<a href="#"><?php echo $pageno?></a>
+				<a href="#" class="active"><?php echo $pageno?></a>
 				<a <?php if($pageno >= $total_pages){echo'disabled';}?> 
 				href="<?php if($pageno >= $total_pages){echo "#";}else{ echo "?pageno=".($pageno+1)."&category_id=".$_GET['category_id'];}?>" class="next-arrow">
 				<i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
-				<a href="?pageno=<?php echo $total_pages;?>&category_id=<?php echo $_GET['category_id'] ?>" >Last</a>
+				<a href="?pageno=<?php echo $total_pages;?>&category_id=<?php echo $_GET['category_id'] ?>" class="active">Last</a>
 			<?php else: ?>
-				<a href="?pageno=1" >First</a>
+				<a href="?pageno=1" class="active">First</a>
 				<a <?php if($pageno <= 1){echo'disabled';}?>
 				href="<?php if($pageno <= 1){echo "#";}else{ echo "?pageno=".($pageno-1);}?>" class="prev-arrow">
 				<i class="fa fa-long-arrow-left" aria-hidden="true"></i></a>
-				<a href="#"><?php echo $pageno?></a>
+				<a href="#" class="active"><?php echo $pageno?></a>
 				<a <?php if($pageno >= $total_pages){echo'disabled';}?> 
 				href="<?php if($pageno >= $total_pages){echo "#";}else{ echo "?pageno=".($pageno+1);}?>" class="next-arrow">
 				<i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
-				<a href="?pageno=<?php echo $total_pages;?>" >Last</a>
+				<a href="?pageno=<?php echo $total_pages;?>" class="active">Last</a>
 			<?php endif; ?>					
 		</div>
 	</div>
@@ -132,19 +126,26 @@
 			?>
 				<div class="col-lg-4 col-md-6">
 					<div class="single-product">
-						<img class="img-fluid" src="admin/images/<?php echo escape($item['image'])?>" alt="" style="height:200px">
+						<a href="product_detail.php?product_id=<?php echo escape($item['id']) ?>"><img class="img-fluid" src="admin/images/<?php echo escape($item['image'])?>" alt="" style="height:200px"></a>
 						<div class="product-details">
 							<h6><?php echo escape($item['name'])?></h6>
 							<h6><?php echo escape($item['price'])?></h6>
 							<div class="prd-bottom">
-								<a href="" class="social-info">
-									<span class="ti-bag"></span>
-									<p class="hover-text">add to bag</p>
-								</a>
-								<a href="product_detail.php?product_id=<?php echo escape($item['id']) ?>" class="social-info">
-									<span class="lnr lnr-move"></span>
-									<p class="hover-text">view more</p>
-								</a>
+								<form action="addtocart.php" method="post">
+									<input type="hidden" name="_token" value="<?php echo $_SESSION['_token']?>">
+									<input type="hidden" name="id" value="<?php echo $item['id']?>">
+									<input type="hidden" name="qty" value="1">
+									<div class="social-info">
+										<button type="submit" style="display:contents">
+											<span class="ti-bag"></span>
+											<p class="hover-text" style="left:20px;">add to bag</p>
+										</button>
+									</div>
+									<a href="product_detail.php?product_id=<?php echo escape($item['id']) ?>" class="social-info">
+										<span class="lnr lnr-move"></span>
+										<p class="hover-text">view more</p>
+									</a>	
+								</form>
 							</div>
 						</div>
 					</div>

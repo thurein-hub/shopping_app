@@ -1,3 +1,12 @@
+<?php
+		session_start();
+		require 'config/common.php';
+		
+		if (empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
+			header('Location: login.php');
+		}
+?>
+
 <!DOCTYPE html>
 <html lang="zxx" class="no-js">
 
@@ -37,6 +46,15 @@
 		<div class="main_menu">
 			<nav class="navbar navbar-expand-lg navbar-light main_box">
 				<div class="container">
+					<?php
+						$cart=0;
+						if(isset($_SESSION['cart'])){
+							
+							foreach($_SESSION['cart'] as $key => $qty){
+								$cart += $qty;
+							}
+						}
+					?>
 					<!-- Brand and toggle get grouped for better mobile display -->
 					<a class="navbar-brand logo_h" href="index.php"><h4>Sunshine Shopping<h4></a>
 					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -45,10 +63,16 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
+					
 					<!-- Collect the nav links, forms, and other content for toggling -->
 					<div class="collapse navbar-collapse offset" id="navbarSupportedContent">
 						<ul class="nav navbar-nav navbar-right">
-							<li class="nav-item"><a href="cart.php" class="cart"><span class="ti-bag"></span></a></li>
+							<li class="nav-item"><a href="cart.php" class="cart">
+							<p class="ti-bag position-relative" style="color: black;padding-top: 30px;">
+							<span class="badge bg-danger position-absolute" style="bottom: 14px;left: 9px;border-radius: 7px;color: white;line-height: 11px !important;">
+							<?php echo $cart; ?></span>
+							</p></a>
+							</li>
 							<li class="nav-item">
 								<button class="search"><span class="lnr lnr-magnifier" id="search"></span></button>
 							</li>
@@ -75,7 +99,7 @@
 		<div class="container">
 			<div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
 				<div class="col-first">
-					<h1>Welcome</h1>
+					<h1>Welcome <?php echo escape($_SESSION['user_name'])?></h1>
 					<a href="logout.php" class="primary-btn" style="line-height: 30px;color: black;background: white;">Logout</a>
 				</div>
 			</div>
