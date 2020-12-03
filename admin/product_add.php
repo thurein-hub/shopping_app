@@ -30,14 +30,10 @@
 
             if(empty($_POST['quantity'])){
                 $qtyError = 'Quantity is required!';
-            }elseif(is_numeric($_POST['quantity']) != 1){
-                $qtyError = 'Quantity must be a number!';
             }
 
             if(empty($_POST['price'])){
                 $priceError = 'Price is required!';
-            }elseif(is_numeric($_POST['price']) != 1){
-                $priceError = 'Price must be a number!';
             }
 
             if(empty($_FILES['image']['name'])){
@@ -45,36 +41,48 @@
             }
 
            }else{
-               $file = 'images/'.$_FILES['image']['name'];
-               $imageType = pathinfo($file, PATHINFO_EXTENSION);
-               if($imageType != 'jpg' && $imageType != 'jpeg' && $imageType != 'png' && $imageType != 'gif'){
-                echo"<script>alert('Image must be jpg,jpeg,png,gif!');window.location.href = 'product_add.php';</script>";
-               }else{
-                   $name = $_POST['name'];
-                   $description = $_POST['description'];
-                   $category = $_POST['category'];
-                   $quantity = $_POST['quantity'];
-                   $price = $_POST['price'];
-                   $image = $_FILES['image']['name'];
-                   move_uploaded_file($_FILES['image']['tmp_name'], $file);
+                if(is_numeric($_POST['quantity']) != 1){
+                    $qtyError = 'Quantity must be a number!';
+                }
 
-                   $stmt = $pdo->prepare("INSERT INTO products(name,description,category_id,quantity,price,image) VALUES(:name,:description,
-                                          :category,:quantity,:price,:image)");
-                   $result=$stmt->execute(
-                            array(
-                                ':name'=>$name,
-                                ':description'=>$description,
-                                ':category'=>$category,
-                                ':quantity'=>$quantity,
-                                ':price'=>$price,
-                                ':image'=>$image
-                                )
-                    );
-                    if($result){
-                        echo"<script>alert('Successfully added');window.location.href='index.php';</script>";
+                if(is_numeric($_POST['price']) != 1){
+                    $priceError = 'Price must be a number!';
+                }
+
+                if(!empty($qtyError) == '' && !empty($priceError) == ''){
+
+                    $file = 'images/'.$_FILES['image']['name'];
+                    $imageType = pathinfo($file, PATHINFO_EXTENSION);
+                    if($imageType != 'jpg' && $imageType != 'jpeg' && $imageType != 'png' && $imageType != 'gif'){
+                        echo"<script>alert('Image must be jpg,jpeg,png,gif!');window.location.href = 'product_add.php';</script>";
+                    }else{
+                        $name = $_POST['name'];
+                        $description = $_POST['description'];
+                        $category = $_POST['category'];
+                        $quantity = $_POST['quantity'];
+                        $price = $_POST['price'];
+                        $image = $_FILES['image']['name'];
+                        move_uploaded_file($_FILES['image']['tmp_name'], $file);
+
+                        $stmt = $pdo->prepare("INSERT INTO products(name,description,category_id,quantity,price,image) VALUES(:name,:description,
+                                                :category,:quantity,:price,:image)");
+                        $result=$stmt->execute(
+                                    array(
+                                        ':name'=>$name,
+                                        ':description'=>$description,
+                                        ':category'=>$category,
+                                        ':quantity'=>$quantity,
+                                        ':price'=>$price,
+                                        ':image'=>$image
+                                        )
+                            );
+                            if($result){
+                                echo"<script>alert('Successfully added');window.location.href='index.php';</script>";
+                            }
+
                     }
-
-               }
+                }
+               
 
            }
     }
